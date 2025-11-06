@@ -12,15 +12,18 @@ export default function World({ articles }) {
 }
 
 export async function getServerSideProps() {
-  const base = "https://livepulse-news-przw.vercel.app"
+  const key = process.env.NEWSAPI_KEY
+  const url = `https://newsapi.org/v2/top-headlines?language=en&pageSize=30&apiKey=${key}`
   try {
-    const res = await fetch(`${base}/api/news?category=world`)
+    const res = await fetch(url)
     const data = await res.json()
     return { props: { articles: data.articles || [] } }
   } catch (err) {
-    console.error("Fetch failed", err)
+    console.error("Fetch failed:", err)
     return { props: { articles: [] } }
   }
 }
+
+
 
 
