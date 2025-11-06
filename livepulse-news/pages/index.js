@@ -12,14 +12,27 @@ export default function Home({ articles }) {
 }
 
 export async function getServerSideProps() {
-  const base = "https://livepulse-news-przw.vercel.app"
+  const base = "https://livepulse-news-przw.vercel.app" // your live domain
   try {
-    const res = await fetch(`${base}/api/news?category=india`)
+    const res = await fetch(`${base}/api/news?category=india`, {
+      headers: { "Cache-Control": "no-cache" },
+    })
     const data = await res.json()
-    return { props: { articles: data.articles || [] } }
+
+    if (!data.articles || data.articles.length === 0) {
+      console.warn("⚠ No articles returned from API")
+    }
+
+    return {
+      props: {
+        articles: data.articles || [],
+      },
+    }
   } catch (err) {
-    console.error("Fetch failed", err)
+    console.error("Error fetching news:", err)
     return { props: { articles: [] } }
   }
 }
+
+
 
