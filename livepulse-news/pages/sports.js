@@ -14,13 +14,17 @@ export default function Sports({ articles }) {
 export async function getServerSideProps() {
   const base = "https://livepulse-news-przw.vercel.app"
   try {
-    const res = await fetch(`${base}/api/news?category=sports`)
+    const res = await fetch(`${base}/api/news?category=sports`, {
+      headers: { "Cache-Control": "no-cache" },
+    })
     const data = await res.json()
     return { props: { articles: data.articles || [] } }
   } catch (err) {
-    console.error("Fetch failed", err)
+    console.error("Error fetching news:", err)
     return { props: { articles: [] } }
   }
 }
+
+
 
 
