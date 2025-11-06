@@ -1,35 +1,53 @@
-import { useEffect, useState } from "react"
-import Layout from "../components/Layout"
-import ArticleList from "../components/ArticleList"
+import fetch from "node-fetch"
 
-export default function Sports() {
-  const [articles, setArticles] = useState([])
-  const [loading, setLoading] = useState(true)
+export default async function handler(req, res) {
+  const key = process.env.NEWSAPI_KEY
+  const category = req.query.category || "india"
+  let url = ""
 
-  useEffect(() => {
-    async function loadNews() {
-      try {
-        const res = await fetch("/api/news?category=sports")
-        const data = await res.json()
-        setArticles(data.articles || [])
-      } catch (err) {
-        console.error("Failed to fetch news:", err)
-      } finally {
-        setLoading(false)
-      }
+  // 📰 Choose API endpoint based on category
+  if (category === "india") {
+    url = `https://newsapi.org/v2/everything?q=india&language=en&pageSize=30&sortBy=publishedAt&apiKey=${key}`
+  } else if (category === "sports") {
+    url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&pageSize=30&apiKey=${key}`
+  } else if (category === "bollywood") {
+    url = `https://newsapi.org/v2/everything?q=bollywood%20OR%20film%20OR%20movie&language=en&pageSize=30&sortBy=publishedAt&apiKey=${key}`
+  } else if (category === "world") {
+    url = `https://newsapi.org/v2/top-headlines?language=en&pageSize=30&apiKey=${key}`
+  } else {
+    url = `https://newsapi.org/v2/top-headlines?language=en&pageSize=30&apiKey=${key}`
+  }
+
+  try {
+    const r = await fetch(url)
+    const j = await r.json()
+
+    // ⚙️ fallback for empty Sports
+    if (category === "sports" && (!j.articles || j.articles.length === 0)) {
+      const g = await fetch(
+        `https://gnews.io/api/v4/search?q=cricket%20OR%20football%20OR%20sports&lang=en&country=in&max=20&apikey=1d85fae12efc7e49e19d5f90c429e94d`
+      )
+      const gj = await g.json()
+      return res.status(200).json({ articles: gj.articles || [] })
     }
-    loadNews()
-  }, [])
 
-  const ticker = articles.slice(0, 6).map(a => a.title)
+    // fallback for any other empty category
+    if (!j.articles || j.articles.length === 0) {
+      const g = await fetch(
+        `https://gnews.io/api/v4/search?q=${category}&lang=en&country=in&max=20&apikey=1d85fae12efc7e49e19d5f90c429e94d`
+      )
+      const gj = await g.json()
+      return res.status(200).json({ articles: gj.articles || [] })
+    }
 
-  return (
-    <Layout tickerHeadlines={ticker}>
-      <h2>Sports — Latest Updates</h2>
-      {loading ? <p>Loading...</p> : <ArticleList articles={articles} />}
-    </Layout>
-  )
+    return res.status(200).json({ articles: j.articles })
+  } catch (e) {
+    console.error("API error:", e)
+    res.status(500).json({ articles: [] })
+  }
 }
+
+
 
 
 
