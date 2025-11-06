@@ -10,9 +10,9 @@ export default async function handler(req, res) {
     url = `https://newsapi.org/v2/everything?q=india&language=en&pageSize=30&sortBy=publishedAt&apiKey=${key}`
   } else if (category === "sports") {
     url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&pageSize=30&apiKey=${key}`
-  } else if (category === "bollywood") {
-    url = `https://newsapi.org/v2/everything?q=bollywood%20OR%20film%20OR%20movie&language=en&pageSize=30&sortBy=publishedAt&apiKey=${key}`
-  } else if (category === "world") {
+  } 
+  
+  else if (category === "world") {
     url = `https://newsapi.org/v2/top-headlines?language=en&pageSize=30&apiKey=${key}`
   } else {
     url = `https://newsapi.org/v2/top-headlines?language=en&pageSize=30&apiKey=${key}`
@@ -46,6 +46,7 @@ export default async function handler(req, res) {
     res.status(500).json({ articles: [] })
   }
 }
+
 
 
 
