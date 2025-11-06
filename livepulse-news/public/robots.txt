@@ -1,0 +1,5 @@
+﻿User-agent: *
+Allow: /
+
+Sitemap: https://livepulse-news.vercel.app/sitemap.xml
+Host: https://livepulse-news.vercel.app
